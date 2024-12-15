@@ -1,0 +1,271 @@
+@00   // Intitialization of VGA screen
+00  //read variable V to reg A   begin first vertical line  v_intial=0   
+00  // mem for v
+
+01  //read constant 49 to B from mem
+32  // mem for 49
+
+02  //send vertival addr to VGA  use reg A
+B0  //bus for vertical
+03  //send horizontal addr to  VGA use reg B
+B1 //bus for horizontal
+01 //read const 1 from reg B 
+01 //mem for 1
+03 //send vga data to buffer
+B2 //bus for vga data
+
+02  //send vertival addr to VGA  use reg A
+B0  //bus for vertical
+01  //read const 109 to B
+6D  //mem for 109
+03  //send horizontal addr to  VGA use reg B   16
+B1 //bus for horizontal
+01 //read const 1 from reg B 
+01 //mem for 1
+03 //send vga data to buffer
+B2 //bus for vga data
+
+54 // increment A after finish sending 
+01 // read constant 120 to reg B from mem
+79 //mem for 120
+
+96 //  if A=B=120 then jump to horizontal line
+02 //addr for next vertical line   TBD(can vary after change the position of the code)
+
+07 // if not, go back to write next pixel
+02 //addr where  to go    TBD (can vary after change the position of the code)     
+00  //read variable H to reg A   begin horizontal line    0x1D
+03    //mem for H
+01   //read  39 to B    0x1F
+04  //mem for 39
+
+02  //send Horizontal addr to VGA  use reg A
+B1  //bus for horizontal
+03  //send vertical addr to  VGA use reg B
+B0 //bus for vertical
+01 //read const 1 from reg B 
+01 //mem for 1
+03 //send vga data to buffer
+B2 //bus for vga data
+02  //send Horizontal addr to VGA  use reg A
+B1  //bus for horizontal
+01 //read 79 to B
+05 //mem for 79
+03  //send vertical addr to  VGA use reg B
+B0 //bus for vertical
+01 //read const 1 from reg B 
+01 //mem for 1
+03 //send vga data to buffer
+B2 //bus for vga data
+
+54 // increment A after finish sending 
+01 //read 160 to B
+06 //mem for 160
+96 //  if A=B=160 then jump to idle
+1E  //addr for idle   TBD(can vary after change the position of the code)
+07  //if not go back to write another pixel
+1F //addr where to go TBD(can vary after change the position of the code)
+
+01   //read b1 to B  MouseY     0x3A
+13   //mem for b1
+00   //read a1 to A MouseX
+12   //mem for a1
+03   //send B to VGA
+B0   // bus for MouseY
+02  //send A to VGA
+B1  // bus for MouseX
+00  //read c to A
+14  //mem for c
+02   //send c to VGA 
+B2  //  bus for vga data
+
+00 // read 0 to A
+07 //
+02  //
+B0
+02
+B1
+02
+B2
+
+00  // read mouse x to A
+A0  // bus for mouse x
+02  //write A in mem as variable a1
+12  //mem for a1
+01  //read Y to B 
+A1  // bus for mouseY
+02  // write A in 7 seg 
+D0  // bus for Mousex
+02  //write A  to vga Mousex
+B1 // bus for horizontal
+03   //write B in 7 seg
+D1  //bus for mouseY
+
+
+
+00  // read status in A
+A2  // bus for status
+02  //write A in LEDs
+C0  //bus for led
+00  //read 119 in mem for A
+77  //mem for constant 119
+15  //compute A-B stores in B
+03  // write B in mem as variable b1
+13  // mem for b1
+03  //send vertical addr to  VGA use reg B
+B0  //bus for vertical   
+00 //read constant 1 to A
+01 //mem for 1
+02   //write A to vga data 
+B2 //bus for vga data
+
+00  //Read 39 to A      
+04  //Mem for constant 39   
+
+96   //jump to set c if A=B=39
+15  //  the address of set c
+
+00  //read 79 in mem to A
+05  // mem for constant 79
+
+
+96 //jump to set c if A=B
+15   //  the address of set  c
+
+00   //read mouseX to A
+12   //mem for a1
+
+01    //read 49 to B
+32   // mem for 49
+ 
+96   //jump to set c if A=B
+15   // the address of set c
+
+01   //read 109 to B
+6D   // mem for 109
+
+96   //jump to set c if A=B
+15   // the address of set c
+01    // if pixel is not on the line, set c to 0   read const 0 to B
+07    //  mem for 0
+03   //write B to c
+14  // mem for c
+
+00    //begin set command first read mousX to A  a1   0x7F
+12    //mem for a1
+01  //read 50 to B
+33   //mem  for 50
+
+B6   // if A<B=50 branch
+16   //addr  x in the left compare y
+01     //if not check if its in mid  read 110 to B
+0D    //mem for 110
+B6   // if A<B=110 branch
+19     //addr for mid zone
+     
+00   // read b1 to A   if not its in right zone, compare y, 
+13   // mem for b1
+01  // read const 40 to B
+08  //mem for 40
+B6    //if A<B=40 locate on the right forward 
+1C     //addr  for sending command right forward  1001
+01	//if not read 80 to B
+0A     //mem for 80
+B6	//if A<B=80 sending command right 0001
+1D	//addr for sending command 0001
+01	//if not send command 0101  read 5 to B
+11   //mem for 5
+03  //write  B to IR
+90  //bus for IR
+08   //idle         0x97
+
+@D0 //send command right forward 1001
+01   //  read 9 to B 
+10   //  mem for 9
+03	//write B to IR
+90  //bus for IR 
+08   //idle   0xCC
+@D5 //sending command right 0001
+01   //  read 1 to B 
+01   //  mem for 1
+03	//write B to IR
+90  //bus for IR 
+08   //idle	  
+
+
+@98 //set c to 1 if on the line     
+01 //read const 1 to B    
+01 //mem for const 1  
+03 //write B to c 
+14  //mem for c
+07   //go to set command
+7F   //addr for set command    0X95
+ 
+@9E // X already in the left, compare y
+00   // read b1 to A
+13   // mem for b1
+01  // read const 40 to B
+08  //mem for 40
+B6    //if A<B=40 locate on the left right 
+17     //addr  for sending command left forward  1010
+01	//if not read 80 to B
+0A     //mem for 80
+B6	//if A<B=80 sending command left 0010
+18	//addr for sending command 0010
+01	//if not send command 0110  read 6 to B
+0C   //mem for 6        
+03  //write  B to IR
+90  //bus for IR
+08   //idle     0xA4
+
+@AD //send command left forward 1010
+01   //  read 10 to B   
+09   //  mem for 10
+03	//write B to IR
+90  //bus for IR 
+08   //idle      0xA9
+@B2 //sending command left 0010
+01   //  read 8 to B 
+0B   //  mem for 8
+03	//write B to IR
+90  //bus for IR 
+08   //idle	   0xAE
+
+@B7  //x already in the mid zone, compare y
+00   // read b1 to A
+13   // mem for b1
+01  // read const 40 to B
+08  //mem for 40
+B6    //if A<B=40 locate on the forward 
+1A     //addr  for sending command  forward  1000
+01	//if not read 80 to B
+0A     //mem for 80
+B6	//if A<B=80 sending command idle 0000
+1B	//addr for sending command 0000
+01	//if not send command 0100  read 4 to B
+0F  //mem for 4
+03  //write  B to IR
+90  //bus for IR
+08   //idle    0xBD
+
+@C6 //send command  forward 1000
+01   //  read 8 to B 
+0E   //  mem for 8
+03	//write B to IR
+90  //bus for IR 
+08   //idle         0xC2
+@CB //sending command  0000
+01   //  read 0 to B 
+07   //  mem for 0
+03	//write B to IR
+90  //bus for IR 
+08   //idle	     0xCF
+
+
+@FE
+CF   //Timer interrupt go back to idle
+3A     //mem for mouse interrupt function
+
+
+
+
